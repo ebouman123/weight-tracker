@@ -1,32 +1,42 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const pool = require("../modules/pool")
+const pool = require("../modules/pool");
 
-router.get('/', async (req, res) => {
+router.get("/", async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM profiles');
+    const result = await pool.query("SELECT * FROM profiles");
     res.json(result.rows);
   } catch (error) {
-    console.error('Error fetching profiles:', error);
+    console.error("Error fetching profiles:", error);
     res.sendStatus(500);
   }
 });
 
-
-router.post('/', async (req, res) => {
+router.post("/", async (req, res) => {
   const { name } = req.body;
 
   try {
     const result = await pool.query(
-      'INSERT INTO profiles (name) VALUES ($1) RETURNING *',
+      "INSERT INTO profiles (name) VALUES ($1) RETURNING *",
       [name]
     );
     res.status(201).json(result.rows[0]);
   } catch (error) {
-    console.error('Error inserting profile:', error);
+    console.error("Error inserting profile:", error);
     res.sendStatus(500);
   }
 });
 
+router.delete("/", async (req, res) => {
+  const { name } = req.body;
+
+  try {
+    await pool.query("DELETE FROM profiles WHERE name = $1;", [name]);
+    res.sendStatus(200);
+  } catch (error) {
+    console.error("Error deleting profile:", error);
+    res.sendStatus(500);
+  }
+});
 
 module.exports = router;

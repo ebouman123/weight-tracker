@@ -31,4 +31,16 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.delete("/", async (req, res) => {
+  const { id } = req.body;
+
+  try {
+    await pool.query("DELETE FROM weights WHERE id = $1;", [id]);
+    res.sendStatus(200);
+  } catch (error) {
+    console.error("Error deleting weight entry:", error);
+    res.sendStatus(500);
+  }
+});
+
 module.exports = router;
