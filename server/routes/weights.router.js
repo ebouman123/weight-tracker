@@ -19,6 +19,10 @@ router.get("/", (req, res) => {
 router.post("/", async (req, res) => {
   const { date, weight, profileId } = req.body;
 
+  if (!date || !weight || !profileId) {
+    return res.status(400).json({ error: "Missing information in request body" });
+  }
+
   try {
     const result = await pool.query(
       "INSERT INTO weights (date, weight, profile_id) VALUES ($1, $2, $3) RETURNING *",
@@ -31,16 +35,16 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.delete("/", async (req, res) => {
-  const { id } = req.body;
-
-  try {
-    await pool.query("DELETE FROM weights WHERE id = $1;", [id]);
-    res.sendStatus(200);
-  } catch (error) {
-    console.error("Error deleting weight entry:", error);
-    res.sendStatus(500);
-  }
-});
+router.delete("/:id", async (req, res) => {
+    const { id } = req.params;
+  
+    try {
+      await pool.query("DELETE FROM weights WHERE id = $1;", [id]);
+      res.sendStatus(200);
+    } catch (error) {
+      console.error("Error deleting profile:", error);
+      res.sendStatus(500);
+    }
+  });
 
 module.exports = router;

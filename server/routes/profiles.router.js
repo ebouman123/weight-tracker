@@ -13,7 +13,11 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const { name } = req.body;
+  const { name } = req.body || {};
+
+  if (!name) {
+    return res.status(400).json({ error: "Missing 'name' in request body" });
+  }
 
   try {
     const result = await pool.query(
@@ -27,11 +31,12 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.delete("/", async (req, res) => {
-  const { name } = req.body;
+
+router.delete("/:id", async (req, res) => {
+  const id = req.params.id;
 
   try {
-    await pool.query("DELETE FROM profiles WHERE name = $1;", [name]);
+    await pool.query("DELETE FROM profiles WHERE id = $1;", [id]);
     res.sendStatus(200);
   } catch (error) {
     console.error("Error deleting profile:", error);
